@@ -1,0 +1,96 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+// Function to display the game board
+void displayBoard(const vector<vector<char>>& board) {
+    for (const auto& row : board) {
+        for (const auto& cell : row) {
+            cout << cell << " ";
+        }
+        cout << endl;
+    }
+}
+
+// Function to check if the current player has won
+bool checkWin(const vector<vector<char>>& board, char player) {
+    // Check rows and columns
+    for (int i = 0; i < 3; ++i) {
+        if ((board[i][0] == player && board[i][1] == player && board[i][2] == player) ||
+            (board[0][i] == player && board[1][i] == player && board[2][i] == player)) {
+            return true;
+        }
+    }
+    // Check diagonals
+    if ((board[0][0] == player && board[1][1] == player && board[2][2] == player) ||
+        (board[0][2] == player && board[1][1] == player && board[2][0] == player)) {
+        return true;
+    }
+    return false;
+}
+
+// Function to check if the game is a draw
+bool checkDraw(const vector<vector<char>>& board) {
+    for (const auto& row : board) {
+        for (const auto& cell : row) {
+            if (cell == ' ') {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Function to switch players
+void switchPlayer(char& currentPlayer) {
+    currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+}
+
+int main() {
+    char playAgain = 'Y';
+
+    while (playAgain == 'Y' || playAgain == 'y') {
+        vector<vector<char>> board(3, vector<char>(3, ' ')); // Initialize 3x3 game board with empty spaces
+        char currentPlayer = 'X';
+        bool gameWon = false;
+        bool gameDraw = false;
+
+        while (!gameWon && !gameDraw) {
+            displayBoard(board);
+
+            int row, col;
+            cout << "Player " << currentPlayer << ", enter your move (row and column): ";
+            cin >> row >> col;
+
+            // Validate the move
+            while (row < 1 || row > 3 || col < 1 || col > 3 || board[row-1][col-1] != ' ') {
+                cout << "Invalid move. Try again: ";
+                cin >> row >> col;
+            }
+
+            board[row-1][col-1] = currentPlayer; // Update the board with the player's move
+
+            gameWon = checkWin(board, currentPlayer);
+            if (gameWon) {
+                displayBoard(board);
+                cout << "Player " << currentPlayer << " wins!" << endl;
+                break;
+            }
+
+            gameDraw = checkDraw(board);
+            if (gameDraw) {
+                displayBoard(board);
+                cout << "It's a draw!" << endl;
+                break;
+            }
+
+            switchPlayer(currentPlayer); // Switch the current player
+        }
+
+        cout << "Do you want to play again? (Y/N): ";
+        cin >> playAgain;
+    }
+
+    return 0;
+}
